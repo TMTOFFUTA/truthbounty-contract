@@ -109,10 +109,6 @@ contract GovernanceSnapshotInvariant is Test {
         snapshot = new GovernanceSnapshot(admin, registrar);
         handler = new GovernanceSnapshotHandler(snapshot, registrar);
 
-        // Grant handler registrar role so it can call registerSnapshot via prank
-        vm.prank(admin);
-        snapshot.grantRole(snapshot.SNAPSHOT_REGISTRAR_ROLE(), registrar);
-
         targetContract(address(handler));
     }
 

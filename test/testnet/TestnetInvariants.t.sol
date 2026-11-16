@@ -75,13 +75,13 @@ contract TestnetInvariants is Test {
     }
 
     function deploy() internal returns (Deployment memory d) {
-        deployer = vm.addr(0);
-        admin = vm.addr(1);
-        claimCreator = vm.addr(2);
-        verifier1 = vm.addr(3);
-        verifier2 = vm.addr(4);
-        challenger = vm.addr(5);
-        outsider = vm.addr(6);
+        deployer = vm.addr(1);
+        admin = vm.addr(2);
+        claimCreator = vm.addr(3);
+        verifier1 = vm.addr(4);
+        verifier2 = vm.addr(5);
+        challenger = vm.addr(6);
+        outsider = vm.addr(7);
         token = new MockERC20("TruthBounty Token", "TBT");
         token.mint(deployer, 10_000_000 * 10**18);
 

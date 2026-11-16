@@ -7,6 +7,7 @@ import "../../../contracts/v2/StakeVault.sol";
 import "../../../contracts/v2/interfaces/IV2Types.sol";
 import "../../../contracts/mocks/MockModuleRegistry.sol";
 import "../../../contracts/MockERC20.sol";
+import {FailClosedEmergencyControls} from "../helpers/FailClosedEmergencyControls.sol";
 
 /// @title SlashingBoundHandler
 /// @notice Stateful handler for V2-SC-097 — cumulative slashing versus locked principal.
@@ -61,6 +62,8 @@ contract SlashingBoundHandler is Test {
         registry = new MockModuleRegistry();
         token = new MockERC20("Stake", "STK");
         vault = new StakeVault(address(registry), address(token), address(this));
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(address(this), 2 hours);
+        vault.setEmergencyControls(address(controls));
 
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
         registry.permitModule(vault.MODULE_SLASHING(), slashing);

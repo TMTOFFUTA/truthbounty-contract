@@ -7,6 +7,7 @@ import "../../contracts/v2/libraries/V2Errors.sol";
 import "../../contracts/mocks/MockModuleRegistry.sol";
 import "../../contracts/mocks/FeeOnTransferERC20.sol";
 import "../../contracts/MockERC20.sol";
+import {FailClosedEmergencyControls} from "./helpers/FailClosedEmergencyControls.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {SafeERC20 as OZSafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -143,6 +144,8 @@ contract AdversarialERC20Test is Test {
         registry = new MockModuleRegistry();
         primary = new MockERC20("Stake", "STK");
         vault = new StakeVault(address(registry), address(primary), address(this));
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(address(this), 2 hours);
+        vault.setEmergencyControls(address(controls));
     }
 
     function _enable(address asset) internal {
