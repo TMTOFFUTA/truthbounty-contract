@@ -56,5 +56,8 @@ library GovernanceRoleTopology {
     function finalizeTimelockAdmin(TimelockController timelock, address currentAdmin) internal {
         timelock.grantRole(TIMELOCK_ADMIN_ROLE, address(timelock));
         timelock.revokeRole(TIMELOCK_ADMIN_ROLE, currentAdmin);
+        // TimelockController uses DEFAULT_ADMIN_ROLE for its bootstrap administrator.
+        // Renounce it as part of the handoff so the deployer does not retain admin authority.
+        timelock.renounceRole(timelock.DEFAULT_ADMIN_ROLE(), currentAdmin);
     }
 }
