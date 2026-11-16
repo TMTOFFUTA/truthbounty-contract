@@ -429,12 +429,13 @@ contract EvidenceRegistryTest is Test {
         uint256 totalClaims = 5;
         for (uint256 cid = 1; cid <= totalClaims; ) {
             uint256 cnt = registry.evidenceCount(cid);
-            if (cnt == 0) { unchecked { ++cid; } continue; }
-            (uint256[] memory ids, ) = registry.claimEvidence(cid, 0, cnt);
+            if (cnt > 0) {
+                (uint256[] memory ids, ) = registry.claimEvidence(cid, 0, cnt);
             for (uint256 j = 0; j < ids.length; ) {
                 EvidenceRegistry.EvidenceCommitment memory ec = registry.getEvidenceCommitment(ids[j]);
                 if (ec.contributor == contributor) expected++;
                 unchecked { ++j; }
+                }
             }
             unchecked { ++cid; }
         }
