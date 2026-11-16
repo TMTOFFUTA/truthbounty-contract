@@ -163,11 +163,11 @@ contract V2_ThreatModel_Reentrancy is Test {
 
         // Trigger withdrawal — the ERC20 will try to re-enter withdraw()
         vm.prank(attacker);
-        vm.expectRevert(); // ReentrancyGuard reverts the inner attempt
         vault.withdraw(address(rtoken), STAKE);
 
-        // Custody must remain unchanged after the failed attack
-        assertEq(vault.totalCustody(address(rtoken)), STAKE);
+        // The nested callback is rejected, while the legitimate outer withdrawal completes.
+        assertTrue(rtoken.reentryBlocked(), "reentrant withdrawal was not blocked");
+        assertEq(vault.totalCustody(address(rtoken)), 0);
     }
 
     /// @notice SC-REENT-002: depositStake() is protected against reentrant attack.
