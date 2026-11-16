@@ -32,6 +32,7 @@ import "../../contracts/v2/interfaces/IEvidence.sol";
 // Shared mocks
 import "../../contracts/mocks/MockModuleRegistry.sol";
 import "../../contracts/MockERC20.sol";
+import {FailClosedEmergencyControls} from "./helpers/FailClosedEmergencyControls.sol";
 
 // Claim registry mock (lightweight — only the IClaimRegistry surface the EvidenceRegistry depends on)
 import "../../contracts/interfaces/IClaimRegistry.sol";
@@ -103,6 +104,7 @@ contract MockClaimRegistry is IClaimRegistry {
 contract ReentrantERC20 is MockERC20 {
     address public target;
     bool public attackEnabled;
+    bool public reentryBlocked;
 
     constructor() MockERC20("ReentrantToken", "RENT") {}
 
@@ -113,7 +115,7 @@ contract ReentrantERC20 is MockERC20 {
         if (attackEnabled && target != address(0)) {
             attackEnabled = false; // prevent infinite loop
             // Attempt reentrant withdraw
-            try StakeVault(target).withdraw(address(this), amount) {} catch {}
+            try StakeVault(target).withdraw(address(this), amount) {} catch { reentryBlocked = true; }
         }
         return super.transfer(to, amount);
     }
@@ -138,6 +140,8 @@ contract V2_ThreatModel_Reentrancy is Test {
         registry = new MockModuleRegistry();
         rtoken   = new ReentrantERC20();
         vault    = new StakeVault(address(registry), address(rtoken), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
 
         vault.setSupportedAsset(address(rtoken), true);
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
@@ -203,6 +207,8 @@ contract V2_AccessControl_Tests is Test {
         registry = new MockModuleRegistry();
         token    = new MockERC20("STK", "STK");
         vault    = new StakeVault(address(registry), address(token), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
 
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
         registry.permitModule(vault.MODULE_SLASHING(),   slashing);
@@ -608,6 +614,8 @@ contract V2_EvidenceRegistry_Tests is Test {
     function setUp() public {
         claimReg = new MockClaimRegistry();
         evReg    = new EvidenceRegistry(admin, address(claimReg));
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        evReg.setEmergencyControls(address(controls));
 
         // Create a claim with a future deadline
         claimId = claimReg.createClaim("test", "ipfs://hash", uint64(block.timestamp + 7 days));
