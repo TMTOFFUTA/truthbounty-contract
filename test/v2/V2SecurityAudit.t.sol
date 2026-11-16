@@ -362,6 +362,8 @@ contract V2_Arithmetic_Tests is Test {
         registry = new MockModuleRegistry();
         token    = new MockERC20("STK", "STK");
         vault    = new StakeVault(address(registry), address(token), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
 
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
         registry.permitModule(vault.MODULE_SLASHING(),   slashing);
@@ -489,6 +491,8 @@ contract V2_StateTransition_Tests is Test {
         registry = new MockModuleRegistry();
         token    = new MockERC20("STK", "STK");
         vault    = new StakeVault(address(registry), address(token), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
 
         token.mint(verifier, STAKE * 4);
@@ -846,6 +850,8 @@ contract V2_ABI_Tests is Test {
         registry = new MockModuleRegistry();
         token    = new MockERC20("STK", "STK");
         vault    = new StakeVault(address(registry), address(token), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
 
         token.mint(verifier, STAKE * 4);
@@ -928,6 +934,8 @@ contract V2_Gas_Tests is Test {
         registry = new MockModuleRegistry();
         token    = new MockERC20("STK", "STK");
         vault    = new StakeVault(address(registry), address(token), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
     }
 
@@ -996,6 +1004,8 @@ contract V2_FailClosed_Tests is Test {
         registry = new MockModuleRegistry();
         token    = new MockERC20("STK", "STK");
         vault    = new StakeVault(address(registry), address(token), admin);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        vault.setEmergencyControls(address(controls));
         registry.permitModule(vault.MODULE_SETTLEMENT(), settlement);
 
         token.mint(verifier, STAKE * 4);
