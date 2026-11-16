@@ -466,6 +466,8 @@ contract EvidenceRegistryFuzzTest is Test {
         FAR_FUTURE = uint64(block.timestamp + 52 weeks);
         claimRegistry = new MockEvidenceClaimRegistry();
         registry = new EvidenceRegistry(admin, address(claimRegistry));
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        registry.setEmergencyControls(address(controls));
         claimRegistry.setClaim(1, admin, FAR_FUTURE, IClaimRegistry.ClaimStatus.Pending);
         claimRegistry.setClaim(2, admin, FAR_FUTURE, IClaimRegistry.ClaimStatus.UnderVerification);
     }
