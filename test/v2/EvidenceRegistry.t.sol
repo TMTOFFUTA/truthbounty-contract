@@ -6,6 +6,7 @@ import "../../contracts/v2/EvidenceRegistry.sol";
 import "../../contracts/v2/interfaces/IEvidence.sol";
 import "../../contracts/v2/interfaces/IV2Types.sol";
 import "../../contracts/mocks/MockEvidenceClaimRegistry.sol";
+import {FailClosedEmergencyControls} from "./helpers/FailClosedEmergencyControls.sol";
 
 contract EvidenceRegistryTest is Test {
     EvidenceRegistry internal registry;
@@ -33,6 +34,8 @@ contract EvidenceRegistryTest is Test {
         FAR_FUTURE = uint64(block.timestamp + 52 weeks);
         claimRegistry = new MockEvidenceClaimRegistry();
         registry = new EvidenceRegistry(admin, address(claimRegistry));
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(admin, 2 hours);
+        registry.setEmergencyControls(address(controls));
 
         claimRegistry.setClaim(CLAIM_A, admin, FAR_FUTURE, IClaimRegistry.ClaimStatus.Pending);
         claimRegistry.setClaim(CLAIM_B, admin, FAR_FUTURE, IClaimRegistry.ClaimStatus.UnderVerification);
@@ -426,6 +429,7 @@ contract EvidenceRegistryTest is Test {
         uint256 totalClaims = 5;
         for (uint256 cid = 1; cid <= totalClaims; ) {
             uint256 cnt = registry.evidenceCount(cid);
+            if (cnt == 0) { unchecked { ++cid; } continue; }
             (uint256[] memory ids, ) = registry.claimEvidence(cid, 0, cnt);
             for (uint256 j = 0; j < ids.length; ) {
                 EvidenceRegistry.EvidenceCommitment memory ec = registry.getEvidenceCommitment(ids[j]);
