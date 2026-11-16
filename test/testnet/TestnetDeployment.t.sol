@@ -90,14 +90,14 @@ contract TestnetDeployment is Test {
     // ============ Helper Functions ============
 
     function deployFullTestnet() internal returns (Deployment memory d) {
-        deployer = vm.addr(0);
-        admin = vm.addr(1);
-        claimCreator = vm.addr(2);
-        verifier1 = vm.addr(3);
-        verifier2 = vm.addr(4);
-        challenger = vm.addr(5);
-        outsider = vm.addr(6);
-        treasury = vm.addr(7);
+        deployer = vm.addr(1);
+        admin = vm.addr(2);
+        claimCreator = vm.addr(3);
+        verifier1 = vm.addr(4);
+        verifier2 = vm.addr(5);
+        challenger = vm.addr(6);
+        outsider = vm.addr(7);
+        treasury = vm.addr(8);
 
         // 1. Deploy Token
         token = new MockERC20("TruthBounty Token", "TBT");
