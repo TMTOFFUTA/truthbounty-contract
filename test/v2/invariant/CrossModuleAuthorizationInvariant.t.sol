@@ -115,6 +115,7 @@ contract CrossModuleAuthorizationTest is Test {
 
         vault = new StakeVault(address(registry), address(token), governance);
         FailClosedEmergencyControls controls = new FailClosedEmergencyControls(governance, 2 hours);
+        vm.prank(governance);
         vault.setEmergencyControls(address(controls));
         allocator = new FinalRewardAllocator(address(registry), 5);
 
@@ -498,6 +499,9 @@ contract UnauthorizedCallerHandler is Test {
         registry = new MockModuleRegistry();
         token = new MockERC20("Stake", "STK");
         vault = new StakeVault(address(registry), address(token), governance);
+        FailClosedEmergencyControls controls = new FailClosedEmergencyControls(governance, 2 hours);
+        vm.prank(governance);
+        vault.setEmergencyControls(address(controls));
         allocator = new FinalRewardAllocator(address(registry), 5);
 
         // A real settlement module exists but is never used by the attackers.
